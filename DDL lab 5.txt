@@ -1,0 +1,38 @@
+Create database CourseRegistrationSystem;
+
+Create table 
+DEPARTMENT(dept_id  int not null , dept_name VARCHAR(100), 
+PRIMARY KEY(dept_id));
+
+Create table
+STUDENT (student_id int not null auto_increment , student_name VARCHAR(50), major VARCHAR(50),level VARCHAR(50),age int not null, 
+PRIMARY key(student_id));
+
+Create table 
+PROFESSOR (prof_id int not null , prof_name VARCHAR(50), dept_id int not null,
+PRIMARY key(prof_id));
+
+
+Create table
+COURSE (course_code VARCHAR(30) not null, name VARCHAR(30), 
+PRIMARY KEY(course_code));
+
+Create table
+SEMESTER_COURSE(course_code VARCHAR(30) not null, quarter tinyint not null, year smallint, prof_id int,
+PRIMARY KEY(course_code,quarter,year));
+
+Create table
+ENROLLED(student_id int not null, course_code VARCHAR(30) not null, quarter tinyint not null, year smallint, enrolled_at VARCHAR(20),
+PRIMARY KEY(student_id,course_code,quarter,year));
+
+ALTER TABLE PROFESSOR ADD FOREIGN KEY (dept_id)
+REFERENCES DEPARTMENT(dept_id);
+
+ALTER TABLE SEMESTER_COURSE ADD FOREIGN KEY (course_code) 
+REFERENCES COURSE(course_code);
+ALTER TABLE SEMESTER_COURSE ADD FOREIGN KEY (prof_id) 
+REFERENCES PROFESSOR(prof_id);
+
+ALTER TABLE ENROLLED ADD FOREIGN KEY (student_id)
+REFERENCES STUDENT(student_id);
+ALTER TABLE ENROLLED ADD FOREIGN KEY (course_code,quarter,year) REFERENCES SEMESTER_COURSE(course_code,quarter,year);

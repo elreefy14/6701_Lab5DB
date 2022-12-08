@@ -1,0 +1,134 @@
+SQL Queries:
+1.
+SELECT S.student_name
+FROM student S,enrolled E
+WHERE S.student_id=E.student_id 
+AND level="SR"
+ IN
+    ( SELECT E.course_code
+        FROM enrolled E,semester_course S
+        WHERE E.course_code=S.course_code
+       IN
+        (SELECT course_code FROM semester_course WHERE prof_id=1));
+
+2.
+SELECT MAX(S.age)
+FROM student S,enrolled E   
+WHERE S.student_id=E.student_id 
+AND major="History"
+ IN    
+       (SELECT E.course_code
+        FROM enrolled E,semester_course S
+        WHERE E.course_code=S.course_code
+       IN
+        (SELECT course_code FROM semester_course WHERE prof_id IN
+       (SELECT professor.prof_id
+FROM professor,semester_course
+WHERE professor.prof_id= semester_course.prof_id) 
+UNION 
+SELECT prof_name FROM professor WHERE prof_name="Michael Miller" ));
+
+3.
+SELECT S.student_name,C.course_name
+FROM student S
+LEFT JOIN enrolled E ON
+S.student_id=E.student_id
+LEFT JOIN course C ON
+E.course_code=C.course_code;
+
+
+
+4.SELECT professor.prof_name
+From professor
+WHERE 5>(SELECT COUNT(E.student_id)
+         FROM enrolled E,semester_course S
+         WHERE E.course_code=S.course_code
+         AND S.prof_id=professor.prof_id);
+
+
+5.SELECT s.student_name
+FROM student S
+LEFT JOIN enrolled E ON
+S.student_id=E.student_id IN (
+SELECT E.course_code
+From enrolled E, semester_course,professor
+WHERE E.course_code=semester_course.course_code
+AND semester_course.prof_id=professor.prof_id="2"
+);	
+
+
+
+6.                                                                                                 
+SELECT *
+FROM course C
+WHERE C.course_code NOT IN (
+SELECT E.course_code
+FROM enrolled E 
+WHERE e.course_code=c.course_code)
+UNION
+SELECT *FROM course c
+WHERE C.course_code IN (
+SELECT semester_course.course_code
+FROM semester_course,professor
+WHERE semester_course.prof_id=professor.prof_id IN (
+SELECT professor.prof_id
+FROM professor,department
+WHERE professor.dept_id=department.dept_id IN ( 
+SELECT department.dept_id
+FROM department
+WHERE department.dept_name="Computer Science" ))
+);
+
+
+
+7.
+SELECT S.student_name
+FROM student S 
+WHERE student_name LIKE 'M%'
+AND age<20
+UNION
+SELECT professor.prof_name
+FROM professor
+WHERE prof_name LIKE 'M%'
+AND  prof_name IN(  
+    SELECT professor.prof_name
+    FROM semester_course,professor
+    WHERE semester_course.prof_id=professor.prof_id
+    GROUP BY professor.pid
+    HAVING COUNT(professor.id)>2
+);
+
+8.
+SELECT P.prof_id,P.prof_name
+FROM professor AS P NATURAL JOIN (semester_course AS sc)
+WHERE p.dept_id=1 OR p.dept_id=2 OR p.dept_id=3 OR p.dept_id=4
+GROUP BY P.prof_id
+     HAVING COUNT(SC.prof_id)<2;
+
+
+9.
+SELECT s.student_name,s.student_id,p.prof_id,p.prof_name
+FROM student S
+LEFT JOIN enrolled E ON
+S.student_id=E.student_id
+LEFT JOIN semester_course sc ON
+E.course_code=SC.course_code
+RIGHT JOIN professor P ON SC.prof_id=P.prof_id;
+
+10.
+SELECT C.name,C.course_code,P.prof_id,P.prof_name
+FROM course C,semester_course SC,professor P
+WHERE C.course_code=SC.course_code IN(
+    SELECT SC.course_code
+    FROM semester_course SC
+    GROUP BY (SC.course_code)
+    HAVING COUNT(SC.prof_id)>2
+     );
+
+11.
+SELECT DISTINCT D.dept_name
+FROM semester_course SC RIGHT OUTER JOIN professor P ON sc.prof_id=p.prof_id
+INNER JOIN department d on p.dept_id=d.dept_id
+    GROUP BY (d.dept_id)
+    HAVING  COUNT(SC.course_code)<3;
+);
